@@ -6,6 +6,8 @@ A procedural spider that walks on the DOM. Its feet plant on real words of the p
 
 ▶ **Demo video** (40 s, original soundtrack): see the [latest release](../../releases/latest).
 
+by **cyohei9907** · inspired by [@rybinfx](https://x.com/rybinfx)
+
 ## Run it
 
 Open `index.html` in a browser, or serve the folder:
@@ -35,6 +37,27 @@ Then visit <http://localhost:5173>.
   - the camera auto-reads downward; manual scrolling is respected for 2.5 s;
   - read articles are swapped for an equal-height spacer (constant DOM size), and the world is rebased when the spacer gets huge — it can run indefinitely at 60 fps.
 - Tunables live in the `T` object at the top of `js/crawler.js` (`cruise` speed, `stopChance`, `stepFrac`, densities…).
+
+## Chrome extension (`extension/`)
+
+Release the spider on **any** web page: click the toolbar icon → **Release the spider** (or press `Alt+Shift+S`).
+
+- The page is **never modified**: feet find real words with `caretRangeFromPoint` + `Intl.Segmenter` (works for CJK too), and every glitch, ghost, silk bar and thread is drawn in one overlay (closed shadow root, `pointer-events: none`, constructable stylesheet so page CSPs don't matter). Recall the spider or reload and nothing is left behind.
+- Settings in the popup: auto-read (the spider scrolls the page down as it reads), size S/M/L, effects calm/normal/wild.
+- Permissions: `activeTab`, `scripting`, `storage` only — no host permissions, no network, no remote code. See [PRIVACY.md](PRIVACY.md).
+
+Try it unpacked: `chrome://extensions` → Developer mode → **Load unpacked** → select `extension/src`.
+
+```bash
+cd extension/tools
+npm install         # puppeteer-core (tests use a Chromium build, e.g. Playwright's)
+node e2e.mjs        # sample page, Wikipedia (en/ja), GitHub (strict CSP), chrome:// refusal, popup
+node shots.mjs      # store screenshots -> ../store/screenshot-*.jpg
+python make_art.py  # icons + promo tiles
+python pack.py      # validate + zip -> ../dist/web-crawlers-<version>.zip
+```
+
+Store listing copy (en / zh_CN / ja), privacy answers and the submission checklist: [`extension/store/listing.md`](extension/store/listing.md).
 
 ## Demo video pipeline (`video/`)
 

@@ -2,16 +2,16 @@
 
     python music.py [--out build/music.wav] [--seed 7]
 
-G major, 120 BPM, 4/4, 20 bars = exactly 40.000 s (48 kHz stereo, 16-bit).
+G major, 120 BPM, 4/4, 11 bars = exactly 22.000 s (48 kHz stereo, 16-bit).
 Only numpy + the standard library (no scipy: it is binary-incompatible with the
 installed numpy here). Every sound is an oscillator / noise burst with an envelope.
 
 Section map (bar = 2.000 s; the video cuts on these lines):
-  0-1  intro    Cmaj7 -> D, shaker, bell teaser, riser into bar 2
-  2-9  A        G D Em C | G D C D   bouncy groove + main melody (4+4 call/answer)
-  10-13 B       C D Bm Em/D          half-time, plucky arpeggios, question/answer lead, fill + riser
-  14-17 A'      G D Em C/D           four-on-the-floor, melody + harmony a third below
-  18-19 outro   G                    final hit, bell arpeggio, fade to true silence
+  0     intro    Cmaj7 | D        shaker, bell teaser, riser into bar 1
+  1-4   A        G D Em C         bouncy groove + main melody (the call phrase)
+  5-6   B        C D/D7           half-time, plucky arpeggios, question/answer lead, fill + riser
+  7-9   A'       G D C/D          four-on-the-floor, answer phrase + harmony a third below, lift
+  10    outro    G                final hit, bell arpeggio, fade to true silence
 """
 import argparse
 import json
@@ -25,11 +25,12 @@ SR = 48000
 BPM = 120
 BAR = 60 / BPM * 4          # 2.0 s
 STEP = BAR / 16             # one 16th = 0.125 s
-BARS = 20
+BARS = 11
 DUR = BARS * BAR            # 40.0 s
 N = int(round(DUR * SR))    # 1,920,000
 
-SECTIONS = [('intro', 0, 2), ('A', 2, 10), ('B', 10, 14), ("A'", 14, 18), ('outro', 18, 20)]
+SECTIONS = [('intro', 0, 1), ('A', 1, 5), ('B', 5, 7), ("A'", 7, 10), ('outro', 10, 11)]
+SEC = {n: (a, b) for n, a, b in SECTIONS}
 
 ap = argparse.ArgumentParser()
 ap.add_argument('--out', default=os.path.join(os.path.dirname(__file__), 'build', 'music.wav'))
@@ -185,12 +186,11 @@ CH = {
     'D7': ([54, 57, 60, 62], 38),
 }
 PROG = {
-    0: [(0, 'Cmaj7')], 1: [(0, 'D')],
-    2: [(0, 'G')], 3: [(0, 'D')], 4: [(0, 'Em')], 5: [(0, 'C')],
-    6: [(0, 'G')], 7: [(0, 'D')], 8: [(0, 'C')], 9: [(0, 'D')],
-    10: [(0, 'C')], 11: [(0, 'D')], 12: [(0, 'Bm')], 13: [(0, 'Em'), (8, 'D7')],
-    14: [(0, 'G')], 15: [(0, 'D')], 16: [(0, 'Em')], 17: [(0, 'C'), (8, 'D')],
-    18: [(0, 'G')], 19: [],
+    0: [(0, 'Cmaj7'), (8, 'D')],
+    1: [(0, 'G')], 2: [(0, 'D')], 3: [(0, 'Em')], 4: [(0, 'C')],
+    5: [(0, 'C')], 6: [(0, 'D'), (8, 'D7')],
+    7: [(0, 'G')], 8: [(0, 'D')], 9: [(0, 'C'), (8, 'D')],
+    10: [(0, 'G')],
 }
 
 
@@ -255,7 +255,7 @@ for bar in range(BARS):
         # drums
         if sec == 'intro':
             place('drums', hat(0.04, 0.35 + 0.25 * (step % 2)), t, 0.35 if step % 2 else -0.35)
-            if bar == 1 and step == 12:
+            if bar == SEC['intro'][1] - 1 and step == 12:
                 place('drums', clap(0.8), t)
         elif sec == 'A':
             if step in (0, 8, 11):
@@ -273,7 +273,7 @@ for bar in range(BARS):
                 place('drums', clap(0.9), t)
             if step % 4 == 2:
                 place('drums', hat(0.05, 0.6), t, 0.3)
-            if bar == 13 and step >= 8:  # snare fill, crescendo
+            if bar == SEC['B'][1] - 1 and step >= 8:  # snare fill, crescendo
                 place('drums', snare(0.35 + 0.08 * (step - 8)), t, -0.1)
         elif sec == "A'":
             if step % 4 == 0:
@@ -286,7 +286,7 @@ for bar in range(BARS):
                 place('drums', hat(0.08, 1.0), t, 0.3)
             else:
                 place('drums', hat(0.025, 0.4), t, -0.3)
-        if sec == "A'" and bar == 14 and step == 0:
+        if sec == "A'" and bar == SEC["A'"][0] and step == 0:
             place('drums', crash(1.0), t, -0.2)
 
         # bass
@@ -322,21 +322,22 @@ for bar in range(BARS):
 
 # melody lines
 ECHO = (STEP * 3, 0.32)
-play_line([(0, 8, 2, B4), (0, 10, 2, D5), (0, 12, 4, G5), (1, 4, 2, A4), (1, 6, 2, D5), (1, 8, 4, Fs5)], 0,
+play_line([(0, 2, 2, E5), (0, 4, 4, G5), (0, 8, 2, A4), (0, 10, 2, D5), (0, 12, 4, Fs5)], SEC['intro'][0],
           lambda m, d: bell(m, d + 0.6), 'lead', 0.32, 0.15, echo=ECHO)
-play_line(MAIN, 2, lead, 'lead', 0.36, 0.0, echo=ECHO)
-play_line(B_LEAD, 10, lead, 'lead', 0.34, 0.1, echo=ECHO)
-play_line([n for n in MAIN if n[0] < 3], 14, lead, 'lead', 0.36, 0.0, echo=ECHO)
-play_line(A2_END, 14, lead, 'lead', 0.36, 0.0, echo=ECHO)
-play_line([(b, s, l, third_below(m)) for b, s, l, m in MAIN if b < 3] +
-          [(b, s, l, third_below(m)) for b, s, l, m in A2_END], 14, soft, 'lead', 0.17, -0.35)
+play_line([n for n in MAIN if n[0] < 4], SEC['A'][0], lead, 'lead', 0.36, 0.0, echo=ECHO)            # call
+play_line([n for n in B_LEAD if n[0] < 2], SEC['B'][0], lead, 'lead', 0.34, 0.1, echo=ECHO)
+A2 = [n for n in MAIN if n[0] in (4, 5)]                                                          # answer: G D
+play_line(A2, SEC["A'"][0] - 4, lead, 'lead', 0.36, 0.0, echo=ECHO)
+play_line(A2_END, SEC["A'"][0] - 1, lead, 'lead', 0.36, 0.0, echo=ECHO)                          # C | D lift
+play_line([(b, s, l, third_below(m)) for b, s, l, m in A2], SEC["A'"][0] - 4, soft, 'lead', 0.17, -0.35)
+play_line([(b, s, l, third_below(m)) for b, s, l, m in A2_END], SEC["A'"][0] - 1, soft, 'lead', 0.17, -0.35)
 
 # risers into A and A'
-place('fx', riser(BAR), t_of(1), 0, 0.8)
-place('fx', riser(BAR), t_of(13), 0, 0.8)
+place('fx', riser(BAR), t_of(SEC['intro'][0]), 0, 0.8)
+place('fx', riser(BAR), t_of(SEC['B'][1] - 1), 0, 0.8)
 
 # outro: final hit on G, bell arpeggio, ring out
-T18 = t_of(18)
+T18 = t_of(SEC['outro'][0])
 place('drums', kick(1.1), T18)
 place('drums', crash(1.2), T18, 0.2)
 place('bass', bass(43, 3.0), T18, 0, 1.0)
@@ -373,7 +374,7 @@ mix = np.tanh(mix / (np.abs(mix).max() * 0.8)) * 0.8
 mix *= 10 ** (-1.5 / 20) / np.abs(mix).max()
 
 # fade the tail so the file ends in true silence at 40.000 s
-fade_from, fade_to = int(38.6 * SR), int(39.85 * SR)
+fade_from, fade_to = int((DUR - 1.2) * SR), int((DUR - .15) * SR)
 f = np.ones(N)
 f[fade_from:fade_to] = np.cos(np.linspace(0, np.pi / 2, fade_to - fade_from)) ** 2
 f[fade_to:] = 0

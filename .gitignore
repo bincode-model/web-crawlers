@@ -12,3 +12,8 @@ extension/dist/
 __pycache__/
 .DS_Store
 Thumbs.db
+
+# extension test tooling
+extension/tools/node_modules/
+extension/tools/.e2e-ext/
+extension/tools/out/

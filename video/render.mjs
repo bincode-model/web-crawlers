@@ -1,6 +1,6 @@
 // Deterministic frame-by-frame capture of the crawler page into a video.
 //
-//   node render.mjs                 full 40 s, 60 fps, 1080x1080 -> out/web-crawlers.mp4
+//   node render.mjs                 full 22 s, 60 fps, 1080x1080 -> out/web-crawlers.mp4
 //   node render.mjs --seconds 6     quick preview of the first 6 s
 //   node render.mjs --from 20 --seconds 8   (still simulates 0..20 s, only encodes 20..28 s)
 //   node render.mjs --mux           only re-mux build/video.mp4 + build/music.wav (new music, no re-render)
@@ -8,7 +8,7 @@
 // The page runs on a virtual clock (rAF / performance.now / setTimeout are
 // replaced before any page script runs) and a seeded Math.random, so every
 // frame is exact no matter how long a screenshot takes, and every render of
-// the same seed is identical. Title card, captions, a scripted cursor and the
+// the same seed is identical. Title card, a scripted cursor and the
 // end card are drawn by an overlay injected into the page (pointer-events:
 // none, so the spider never steps on it). If build/music.wav exists it is
 // muxed in.
@@ -27,14 +27,15 @@ const arg = (name, def) => {
 
 const FPS = +arg('fps', 60);
 const FROM = +arg('from', 0);
-const SECONDS = +arg('seconds', 40 - FROM);
+const TOTAL = 22;                                  // must match music.py (11 bars @ 120 BPM)
+const SECONDS = +arg('seconds', TOTAL - FROM);
 const SEED = +arg('seed', 20261002);
 const VIEW = 720, DSF = 1.5;                       // 720 css px * 1.5 = 1080 px video
 const CHROME = process.env.CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const BUILD = path.join(HERE, 'build'), OUT = path.join(HERE, 'out');
-const silent = path.join(BUILD, FROM || SECONDS < 40 ? 'preview.mp4' : 'video.mp4');
+const silent = path.join(BUILD, FROM || SECONDS < TOTAL ? 'preview.mp4' : 'video.mp4');
 const music = path.join(BUILD, 'music.wav');
-const final = path.join(OUT, FROM || SECONDS < 40 ? 'preview.mp4' : 'web-crawlers.mp4');
+const final = path.join(OUT, FROM || SECONDS < TOTAL ? 'preview.mp4' : 'web-crawlers.mp4');
 mkdirSync(BUILD, { recursive: true }); mkdirSync(OUT, { recursive: true });
 
 // ---------------------------------------------------------------------------
@@ -74,7 +75,7 @@ function inject(SEED) {
   document.addEventListener('DOMContentLoaded', () => window.__stage && window.__stage());
 }
 
-// overlay: title, captions, cursor, end card — all driven by virtual time
+// overlay: title, cursor, end card (by cyohei9907, inspired by @rybinfx) — all driven by virtual time
 function stage() {
   const css = `
     #hint { display: none !important; }
@@ -89,11 +90,6 @@ function stage() {
     .card .g { font: 400 34px/1 "Courier New", monospace; color: #5cc8ff; margin-top: 18px; letter-spacing: .1em; }
     .card .s { font-size: 19px; color: #a2a9b1; margin-top: 26px; letter-spacing: .04em; text-align: center; line-height: 1.6; }
     .card .s b { color: #e8e9eb; font-weight: 600; }
-    .cap { position: absolute; left: 26px; bottom: 30px; max-width: 640px; padding: 12px 16px 12px 14px;
-           background: rgba(0,0,0,.82); outline: 1px solid var(--c); outline-offset: 3px; opacity: 0; }
-    .cap .zh { font-size: 25px; font-weight: 600; color: #f2f2f2; letter-spacing: .03em; }
-    .cap .en { font: 15px "Courier New", monospace; color: var(--c); margin-top: 5px; letter-spacing: .06em; }
-    .cap .zh::before { content: ""; display: inline-block; width: 11px; height: 11px; background: var(--c); margin-right: 10px; vertical-align: 2px; }
     .cursor { position: absolute; width: 26px; height: 26px; opacity: 0; transform-origin: 0 0; }
     .ripple { position: absolute; width: 10px; height: 10px; margin: -5px 0 0 -5px; border: 2px solid #ffe14d; border-radius: 50%; opacity: 0; }
     .fade { position: absolute; inset: 0; background: #000; opacity: 0; }
@@ -109,25 +105,8 @@ function stage() {
     root.appendChild(c);
     return c;
   };
-  const intro = mkCard('一只在网页文字上爬行的蜘蛛<br><b>a spider that walks on the DOM</b>');
-  const outro = mkCard('<b>js × css</b><br>每一只脚都踩在真实的文字上');
-
-  const CAPS = [
-    [4, 8, '脚踩在真实的单词上', 'feet grip real DOM words', '#3d6dff'],
-    [8, 12, '每一步都在改写 CSS', 'every step mutates the page', '#ff36d9'],
-    [12, 16, '蛛丝 · 残影 · 拉伸的链接', 'silk threads, ghosts, stretched links', '#6dffb0'],
-    [16, 20, '自动向下阅读，永不回头', 'always reading onward', '#ffe14d'],
-    [20, 24.5, '它会追着你的鼠标', 'it follows your cursor', '#42cfff'],
-    [24.5, 28, '点击，派它去那里', 'click to send it somewhere', '#ff7d45'],
-    [28, 32, '无限页面 · 读过的自动回收', 'endless page, constant memory', '#b44dff'],
-    [32, 36, '纯 JavaScript × CSS，60fps', 'just js × css, 60 fps', '#ff5ca8'],
-  ];
-  const caps = CAPS.map(([a, b, zh, en, c]) => {
-    const el = document.createElement('div'); el.className = 'cap'; el.style.setProperty('--c', c);
-    el.innerHTML = `<div class="zh">${zh}</div><div class="en">${en}</div>`;
-    root.appendChild(el);
-    return { a, b, el };
-  });
+  const intro = mkCard('');
+  const outro = mkCard('<b>by cyohei9907</b><br>inspired by @rybinfx');
 
   const cursor = document.createElement('div'); cursor.className = 'cursor';
   cursor.innerHTML = `<svg viewBox="0 0 26 26" width="26" height="26"><path d="M3 2 L3 21 L8.5 16 L12.5 24.5 L16 23 L12 14.8 L19.5 14.8 Z" fill="#fff" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
@@ -142,9 +121,9 @@ function stage() {
   // title letters glitch in with the page's own mutation classes
   function glitchTitle(card, t, frame) {
     card.querySelectorAll('.tl').forEach((s, i) => {
-      const on = t > .08 * i;                                   // letters arrive one by one
+      const on = t > .06 * i;                                   // letters arrive one by one
       s.style.visibility = on ? 'visible' : 'hidden';
-      const settle = t - .08 * i;
+      const settle = t - .06 * i;
       const flick = settle < .35 || hash(frame >> 2, i) < .05;  // settling, then rare flickers
       s.className = 'tl';
       s.style.removeProperty('--mc'); s.style.removeProperty('--mt');
@@ -157,9 +136,11 @@ function stage() {
     });
   }
 
-  // scripted pointer: lure (20-24.5 s), then a click (25 s), then leave
-  const P = [[690, 640, 20.0], [520, 470, 21.2], [250, 300, 22.6], [470, 220, 23.8], [430, 560, 24.6], [430, 560, 25.4], [760, 620, 26.6]];
-  const CLICK_AT = 25.0;
+  // scripted pointer: lure (10-12.8 s), then a click (13 s), then leave
+  // timeline (s), on the music's bar lines: title 0-2 | crawl 2-10 | cursor 10-14 | crawl 14-20 | end card 20-22
+  const INTRO_OUT = 1.5, OUTRO_IN = 20, FADE_OUT = 21.3, LURE_END = 12.8;
+  const P = [[690, 640, 10.0], [520, 470, 10.8], [250, 300, 11.6], [470, 220, 12.2], [430, 560, 12.8], [430, 560, 13.3], [760, 620, 14.0]];
+  const CLICK_AT = 13.0;
   function pointerAt(t) {
     for (let i = 0; i < P.length - 1; i++) {
       const [x0, y0, t0] = P[i], [x1, y1, t1] = P[i + 1];
@@ -173,22 +154,13 @@ function stage() {
     frame++;
     document.documentElement.classList.toggle('blink-off', ((t * 1000 / 70) | 0) % 2 === 1);
 
-    // intro card: 0 - 4 s (fades out over the last 0.6 s)
-    intro.style.opacity = t < 3.4 ? 1 : 1 - ease((t - 3.4) / .6);
-    if (t < 4) glitchTitle(intro, t, frame);
-    // outro card: 36 s on
-    outro.style.opacity = ease((t - 36) / .5);
-    if (t >= 36) glitchTitle(outro, t - 36, frame);
-    fade.style.opacity = ease((t - 39.2) / .8);
-
-    // captions: quick glitchy entrance, fade at the end of their slot
-    for (const c of caps) {
-      const k = t - c.a, left = c.b - t;
-      if (k < 0 || left < 0) { c.el.style.opacity = 0; continue; }
-      const enter = k < .25 ? (hash(frame, 3) < .5 ? .25 : 1) : 1;  // flickers in
-      c.el.style.opacity = Math.min(enter, ease(left / .3));
-      c.el.style.transform = `translateX(${(1 - ease(k / .25)) * -14}px)`;
-    }
+    // intro card: 0 - 2 s (fades out over the last 0.5 s)
+    intro.style.opacity = t < INTRO_OUT ? 1 : 1 - ease((t - INTRO_OUT) / .5);
+    if (t < INTRO_OUT + .5) glitchTitle(intro, t, frame);
+    // outro card: 20 s on, then fade to black
+    outro.style.opacity = ease((t - OUTRO_IN) / .4);
+    if (t >= OUTRO_IN) glitchTitle(outro, t - OUTRO_IN, frame);
+    fade.style.opacity = ease((t - FADE_OUT) / .7);
 
     // pointer
     const p = pointerAt(t);
@@ -197,7 +169,7 @@ function stage() {
       cursor.style.opacity = 1;
       cursor.style.left = x + 'px'; cursor.style.top = y + 'px';
       const mx = prev ? x - prev[0] : 0, my = prev ? y - prev[1] : 0;
-      if (t < 24.6 && (mx || my)) window.dispatchEvent(new MouseEvent('mousemove', { clientX: x, clientY: y, movementX: mx, movementY: my }));
+      if (t < LURE_END && (mx || my)) window.dispatchEvent(new MouseEvent('mousemove', { clientX: x, clientY: y, movementX: mx, movementY: my }));
       if (!clicked && t >= CLICK_AT) {
         clicked = true;
         window.dispatchEvent(new MouseEvent('click', { clientX: x, clientY: y }));
