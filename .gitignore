@@ -1,0 +1,14 @@
+# video pipeline: dependencies and rendered outputs (videos ship as release assets)
+video/node_modules/
+video/build/
+video/out/
+
+# extension packaging output
+extension/dist/
+*.zip
+
+# local tooling
+.claude/
+__pycache__/
+.DS_Store
+Thumbs.db
