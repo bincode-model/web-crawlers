@@ -98,7 +98,7 @@
       return `${W(authors())} (${year()}). "${X(title())}"${R() < .15 ? '<span class="pdf"> (PDF)</span>' : ''}. <i>${A(pick(VENUE))}</i>. <b>${ri(1, 220)}</b> (${ri(1, 12)}): ${ri(1, 900)}–${ri(901, 999)}.${ids()}`;
     }
     if (kind < .92) { // web / archived
-      return `"${X(title())}". ${W(pick(['phobias-help.com', 'arachnid-archive.org', 'Field Museum Notes', 'silkwire.net', 'Spider Survey Online']))}. ${A('Archived', 'ext')} from ${A('the original', 'ext')} on ${date()}. Retrieved ${date()}.`;
+      return `"${X(title())}". ${W(pick(['eightlegs.example', 'arachnid-notes.example', 'Fieldbook Quarterly Online', 'silkwire.example', 'Spider Survey Digest']))}. ${A('Archived', 'ext')} from ${A('the original', 'ext')} on ${date()}. Retrieved ${date()}.`;
     }
     return `${W(authors())} (${date()}). "${X(title())}". <i>${A(pick(['The Evening Lantern', 'Harbor Gazette', 'The Weekly Orb', 'Northern Courier']))}</i>. pp.&nbsp;${ri(10, 90)}–${ri(91, 120)}.`;
   };
@@ -172,7 +172,7 @@
     h += cv(`<h2>${W('General and cited references')}</h2><ul class="refs">${listOf(ri(5, 9), citation)}</ul>`);
     h += cv(`<h2>${W('Further reading')}</h2><ul class="refs">${listOf(ri(5, 9), citation)}</ul>`);
     h += cv(`<h2 class="ext-links">${W('External links')}</h2><ul class="refs">${listOf(ri(3, 6), () =>
-      `${X(title())} (${A('Archived', 'ext')} ${date()} at the ${A('Wayback Machine')})`)}</ul>`);
+      `${X(title())} (${A('Archived', 'ext')} ${date()} at the ${A('Page Archive')})`)}</ul>`);
     h += cv(navbox()) + `</article>`;
     return h;
   }

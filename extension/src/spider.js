@@ -386,16 +386,28 @@
     return false;
   }
 
+  // a foothold near the step target that is really within reach: the word search
+  // around the target can drift ~25 px, which is a lot for a 150 px leg
+  function foothold(L) {
+    const h = hipPos(L), tgt = stepTarget(L), lim = (L.L1 + L.L2) * T.placeFrac + 6;
+    const rad = L.palp ? 8 : 18 * Math.sqrt(SCALE);
+    let a = anchorFrom(tgt, rad, 4);
+    if (dist(V(a.x, a.y), h) > lim) a = anchorFrom(tgt, rad * .35, 3);   // too far: look closer
+    if (dist(V(a.x, a.y), h) > lim) a = { kind: 'none', x: tgt.x, y: tgt.y }; // still too far: bare ground
+    return a;
+  }
+
   function startStep(L, quick) {
     const h = hipPos(L), full = L.L1 + L.L2;
     let from = L.foot ? anchorPos(L.foot) : restPos(L);
     const d = sub(from, h), dl = len(d);
     if (dl > full) from = add(h, mul(d, full / dl));
     L.from = from;
-    L.next = anchorFrom(stepTarget(L), L.palp ? 8 : 18 * Math.sqrt(SCALE), 4);
+    L.next = foothold(L);
     L.t = 0;
     L.dur = quick ? .07 + R() * .04 : (L.palp ? .08 : .1) + R() * .07;
     L.stepping = true;
+    L.retarget = false;
     if (L.bar) { L.bar.until = Math.min(L.bar.until, now + .15); L.bar = null; }
   }
 
@@ -467,7 +479,20 @@
 
     const maxStepping = sp > 70 ? 6 : 4;
     for (const L of legs) {
-      if (L.stepping) { L.t += dt / L.dur; if (L.t >= 1) plant(L); continue; }
+      if (L.stepping) {
+        L.t += dt / L.dur;
+        // the body kept moving during the step: if the chosen foothold is now out of reach, pick a closer one (once)
+        if (!L.retarget && dist(anchorPos(L.next), hipPos(L)) > (L.L1 + L.L2) * T.overFrac) {
+          L.next = foothold(L);
+          L.retarget = true;
+        }
+        if (L.t >= 1) {
+          plant(L);
+          // landed out of reach anyway (the body kept going): lift it again right away
+          if (dist(anchorPos(L.foot), hipPos(L)) > (L.L1 + L.L2) * T.overFrac) startStep(L, true);
+        }
+        continue;
+      }
       const fp = L.foot ? anchorPos(L.foot) : restPos(L);
       const off = dist(fp, restPos(L));
       const over = dist(fp, hipPos(L)) > (L.L1 + L.L2) * T.overFrac;

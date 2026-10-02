@@ -3,7 +3,7 @@
     "message": "Web Crawlers"
   },
   "extDesc": {
-    "message": "一只程序化的蜘蛛在任意网页的文字上爬行，留下彩色的故障特效。网页本身不会被修改。"
+    "message": "在你正在浏览的网页上放出一只霓虹蜘蛛：它踩着页面上真实的文字爬行，被踩到的字会短暂“故障”变形。不改动页面，不收集任何数据。"
   },
   "actionTitle": {
     "message": "Web Crawlers — 在此页面放出蜘蛛"

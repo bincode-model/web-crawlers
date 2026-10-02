@@ -47,6 +47,7 @@ export async function launch({ width = 1280, height = 800 } = {}) {
   return {
     browser, sw, extId, port,
     sampleUrl: `http://localhost:${port}/extension/tools/demo.html`,
+    storeUrl: `http://localhost:${port}/extension/tools/store-sample.html`,
     tabIdOf: async page => sw.evaluate(async u => (await chrome.tabs.query({})).find(t => t.url === u)?.id, page.url()),
     inTab: (tabId, fn) => sw.evaluate(`exec(${tabId}, ${fn})`),
     toggle: tabId => sw.evaluate(id => toggle(id), tabId),

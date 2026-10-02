@@ -18,7 +18,7 @@ None. Web Crawlers does not collect, transmit, store remotely, sell or share any
 
 ### What the extension reads on the page
 
-When you click the toolbar button and press "Release the spider" (or press its keyboard shortcut), Chrome gives the extension temporary access to the current tab (the `activeTab` permission). The extension then reads where the words sit on that page, so the spider's feet can land on real text and the words it touches can be animated.
+When you click the toolbar button (or press its keyboard shortcut), Chrome gives the extension temporary access to the current tab (the `activeTab` permission). Opening the popup only checks whether a spider is already on that page. When you press "Release the spider" (or use the shortcut), the extension reads where the words sit on that page, so the spider's feet can land on real text and the words it touches can be animated.
 
 - This happens **locally, in your browser, in memory**, and only while the spider is on the page.
 - The page content is never saved, logged or sent anywhere. It does not leave your browser.
@@ -33,7 +33,7 @@ Only your own settings:
 - spider size (S/M/L)
 - effect density (calm/normal/wild)
 
-These are saved with `chrome.storage.sync`. If you are signed in to Chrome with sync turned on, Chrome may sync these settings across your own signed-in browsers. That sync is handled by Chrome under your Google Account settings, and the developer has no access to it. Uninstalling the extension deletes these settings.
+These are saved with `chrome.storage.sync`. If you are signed in to Chrome with sync turned on, Chrome may sync these settings across your own signed-in browsers. That sync is handled by Chrome under your Google Account settings, and the developer has no access to it. Removing the extension removes its settings from that browser; a copy synced by Chrome stays under your Google Account's sync data, which you can clear in Chrome's sync settings.
 
 ### Network requests, analytics and remote code
 
@@ -78,7 +78,7 @@ Web Crawlers 是一个 Chrome 扩展程序，它会让一只动画蜘蛛在你�
 
 ### 扩展程序在页面上读取的内容
 
-当你点击工具栏按钮并按下“放出蜘蛛”（或按下它的快捷键）时，Chrome 会授予扩展程序对当前标签页的临时访问权限（`activeTab` 权限）。扩展程序随后会读取页面上文字的位置，让蜘蛛的脚落在真实的文字上，并为它碰到的文字绘制动画效果。
+当你点击工具栏按钮（或按下它的快捷键）时，Chrome 会授予扩展程序对当前标签页的临时访问权限（`activeTab` 权限）。打开弹出窗口时，它只会检查该页面上是否已经有蜘蛛。当你按下“放出蜘蛛”（或使用快捷键）后，扩展程序才会读取页面上文字的位置，让蜘蛛的脚落在真实的文字上，并为它碰到的文字绘制动画效果。
 
 - 这一切都只在**你的浏览器本地、内存中**进行，并且仅在蜘蛛停留在页面上时进行。
 - 页面内容不会被保存、记录或发送到任何地方，不会离开你的浏览器。
@@ -93,7 +93,7 @@ Web Crawlers 是一个 Chrome 扩展程序，它会让一只动画蜘蛛在你�
 - 蜘蛛大小（S / M / L）
 - 效果密度（平静 / 普通 / 狂野）
 
-这些设置通过 `chrome.storage.sync` 保存。如果你已登录 Chrome 并开启了同步，Chrome 可能会在你自己登录的多个浏览器之间同步这些设置。该同步由 Chrome 根据你的 Google 账号设置完成，开发者无法访问。卸载扩展程序会删除这些设置。
+这些设置通过 `chrome.storage.sync` 保存。如果你已登录 Chrome 并开启了同步，Chrome 可能会在你自己登录的多个浏览器之间同步这些设置。该同步由 Chrome 根据你的 Google 账号设置完成，开发者无法访问。移除扩展程序会删除它在该浏览器中的设置；Chrome 已同步的副本保存在你 Google 账号的同步数据中，可在 Chrome 的同步设置里清除。
 
 ### 网络请求、统计分析与远程代码
 

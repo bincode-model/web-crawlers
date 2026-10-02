@@ -926,7 +926,7 @@ def marquee_cfg():
         style=dict(lw=3.0, box_w=2.2, conn_w=1.4, connectors=True, dot_k=1.12),
         glow_r=8, glow_k=0.7,
         title=dict(x=96, y_glyph=150, glyph_px=48, title_px=104, tag_px=27, tag_gap=1.95,
-                   tag_lines=["a spider that walks", "on any web page"]),
+                   tag_lines=["a spider that walks", "on the page you read"]),
     )
 
 
@@ -961,7 +961,7 @@ def small_cfg():
         style=dict(lw=1.9, box_w=1.25, conn_w=0.8, connectors=True, dot_k=1.0),
         glow_r=3.5, glow_k=0.65,
         title=dict(x=24, y_glyph=73, glyph_px=24, title_px=44, tag_px=15, tag_gap=1.85,
-                   tag_lines=["a spider that walks", "on any web page"]),
+                   tag_lines=["a spider that walks", "on the page you read"]),
     )
 
 

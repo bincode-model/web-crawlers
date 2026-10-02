@@ -43,20 +43,20 @@ Web Crawlers lets a small neon spider loose on the page you're reading.
 
 Click the toolbar icon, press "Release the spider", and it drops onto the page. Its cyan legs feel for the page's actual words (headlines, paragraphs, link text) and plant their feet on them. Every word it steps on glitches for a moment: a coloured outline, a highlight, a monospace blow-up, a sudden tilt, a stretched bar of "silk", a ghostly echo, a thin thread trailing behind. Then the word settles back exactly as it was.
 
-The spider is procedural. Every leg, joint and step is drawn by code in real time, so each walk turns out a little different. It started as a small generative art piece about how we read the web. Now it can wander across any page you like.
+The spider is procedural. Every leg, joint and step is drawn by code in real time, so each walk turns out a little different. It started as a small generative art piece about how we read the web. Now it can wander across the pages you read.
 
 HOW TO USE
 1. Open an ordinary web page: an article, a blog post, a wiki page, anything with text on it.
 2. Click the Web Crawlers icon in the toolbar. (If you don't see it, open the puzzle-piece Extensions menu and pin it.)
 3. Press "Release the spider".
-4. To send it home, open the popup again and call it back, or just reload the page.
+4. To send it home, open the popup again and press "Recall the spider", or just reload the page.
 
-Shortcut: Alt+Shift+S releases or recalls the spider on the current tab (you can change it at chrome://extensions/shortcuts).
+Shortcut: Alt+Shift+S releases or recalls the spider on the current tab. Chrome only assigns it if no other extension uses it already; if the popup shows "not set", pick your own at chrome://extensions/shortcuts.
 
 SETTINGS
 • Auto-read: the spider slowly scrolls the page down as it reads, so you can sit back and watch.
 • Size: small, medium or large.
-• Effect density: calm, normal or wild.
+• Effects: calm, normal or wild (how busy the glitches are).
 Your settings are saved with Chrome's built-in storage. If Chrome sync is on, they follow you to your other signed-in Chrome browsers.
 
 YOUR PAGE AND YOUR DATA
@@ -103,14 +103,14 @@ Web Crawlers 会把一只小小的霓虹蜘蛛放到你正在浏览的网页上�
 1. 打开一个普通网页：文章、博客、百科页面，只要有文字就行。
 2. 点击工具栏中的 Web Crawlers 图标。（找不到的话，打开拼图形状的“扩展程序”菜单，把它固定到工具栏。）
 3. 按下“放出蜘蛛”。
-4. 想让它回家时，再次打开弹出窗口把它召回，或者直接刷新页面。
+4. 想让它回家时，再次打开弹出窗口按“收回蜘蛛”，或者直接刷新页面。
 
-快捷键：Alt+Shift+S 可以在当前标签页放出或收回蜘蛛（可在 chrome://extensions/shortcuts 中修改）。
+快捷键：Alt+Shift+S 可以在当前标签页放出或收回蜘蛛。只有在没有其他扩展占用时 Chrome 才会分配它；如果弹出窗口显示“未设置”，请在 chrome://extensions/shortcuts 中自行设置。
 
 设置
 • 自动阅读：蜘蛛一边读，一边慢慢向下滚动页面，你只需要坐着看。
 • 大小：小、中、大。
-• 效果密度：平静、普通、狂野。
+• 特效：平静、普通、狂野（特效的多少）。
 设置保存在 Chrome 自带的存储中。如果开启了 Chrome 同步，设置会同步到你用同一账号登录的其他 Chrome 浏览器。
 
 你的页面与你的数据
@@ -157,9 +157,9 @@ Web Crawlers は、いま読んでいるページに小さなネオンの蜘蛛�
 1. 記事、ブログ、Wiki など、文字のある普通のウェブページを開きます。
 2. ツールバーの Web Crawlers アイコンをクリックします。（見当たらない場合は、パズルピース型の「拡張機能」メニューから固定してください。）
 3. 「蜘蛛を放つ」を押します。
-4. 帰らせたいときは、もう一度ポップアップを開いて呼び戻すか、ページを再読み込みしてください。
+4. 帰らせたいときは、もう一度ポップアップを開いて「蜘蛛を呼び戻す」を押すか、ページを再読み込みしてください。
 
-ショートカット：Alt+Shift+S で、いまのタブに蜘蛛を放つ / 呼び戻すことができます（chrome://extensions/shortcuts で変更できます）。
+ショートカット：Alt+Shift+S で、いまのタブに蜘蛛を放つ / 呼び戻すことができます。ほかの拡張機能が使っていない場合にのみ Chrome が割り当てます。ポップアップに「未設定」と表示されたら、chrome://extensions/shortcuts で設定してください。
 
 設定
 • 自動読み進め：蜘蛛が読みながらページをゆっくり下へスクロールします。のんびり眺めていてください。
@@ -202,13 +202,13 @@ Web Crawlers is a piece of interactive visual art for the current web page. When
 **activeTab**
 
 ```text
-Grants temporary access to the tab the user is looking at, and only after they click the Web Crawlers toolbar button, so the spider can be placed on that page. This lets the extension work on whatever site the user chooses without requesting any host permissions.
+Grants temporary access to the tab the user is looking at, only after they click the Web Crawlers toolbar button (which opens the popup) or press the extension's keyboard shortcut, so the spider can be placed on that page. This lets the extension work on the site the user chooses without requesting any host permissions.
 ```
 
 **scripting**
 
 ```text
-Used together with activeTab to inject the extension's own packaged spider script and its overlay styles into the current tab at the moment the user presses "Release the spider". Only files bundled inside the extension are injected. No code is downloaded.
+Used with activeTab to run the extension's own packaged code in the current tab, only after the user clicks the toolbar button or presses the keyboard shortcut. When the popup opens, a one-line function checks whether the spider is already on the page. "Release the spider" (or the shortcut) injects the bundled spider.js, which draws everything, styles included, inside its own closed shadow root. "Recall the spider" and the popup's settings call functions of that same script. Only files bundled inside the extension are injected; no code is downloaded.
 ```
 
 **storage**
@@ -272,7 +272,7 @@ Store assets live in `extension/store/` (screenshots, promo tiles) and `extensio
 3. [ ] **Upload the zip.** Run `python extension/tools/pack.py`. It validates the package (permissions, icon sizes, referenced files, locale keys, description length) and writes `extension/dist/web-crawlers-<version>.zip` with `manifest.json` at the zip root. Then go to **Add new item → upload**.
 4. [ ] **Store listing tab.** Paste the detailed description for English, then add Chinese (Simplified) and Japanese and paste theirs. Set category **Just for Fun**, homepage URL and support URL (see the table at the top).
 5. [ ] **Store icon (128×128).** Upload `extension/src/icons/icon128.png`. Use the same artwork as the 128 px icon inside the package: about 96×96 of artwork with transparent padding, legible on light and dark backgrounds.
-6. [ ] **Screenshots (at least 1, up to 5, 1280×800).** Upload `extension/store/screenshot-1.jpg` … `screenshot-4.jpg`. They were captured by `extension/tools/shots.mjs` on the project's own sample page (`extension/tools/demo.html`, procedurally generated text), so no third-party site, logo or trademark appears.
+6. [ ] **Screenshots (at least 1, up to 5, 1280×800).** Upload `extension/store/screenshot-1.jpg` … `screenshot-4.jpg`. They were captured by `extension/tools/shots.mjs` on a neutral, original sample article (`extension/tools/store-sample.html`, light and dark theme), so no third-party site, layout, logo or trademark appears.
 7. [ ] **Small promo tile (440×280).** Upload `extension/store/promo-small-440x280.png`.
 8. [ ] **Marquee promo tile (1400×560, optional).** Upload `extension/store/promo-marquee-1400x560.png` if it exists.
 9. [ ] **Privacy tab.** Paste the single purpose description, the three permission justifications, the remote-code answer and the data-usage answers above. Tick the three certifications.
