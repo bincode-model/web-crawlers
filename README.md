@@ -4,9 +4,11 @@ A procedural spider that walks on the DOM. Its feet plant on real words of the p
 
 一只在网页文字上爬行的程序化蜘蛛：它的脚踩在页面真实的单词上，被踩到的文字会短暂地“变异”——描边、高亮、等宽放大、旋转、拉伸成色条、残影、远距离蛛丝。纯 JavaScript × CSS，无需构建，无依赖。
 
-▶ **Demo video** (40 s, original soundtrack): see the [latest release](../../releases/latest).
+▶ **Demo video** (40 s, original soundtrack): see the [original project's latest release](https://github.com/cyohei9907/web-crawlers/releases/latest).
 
 by **cyohei9907** · inspired by [@rybinfx](https://x.com/rybinfx)
+
+此仓库为原项目的个人副本，保留原作者来源和提交历史，另补 [中文使用说明](使用说明.txt) 与 [Mac 启动辅助脚本](启动演示.command)。本项目提供网页蜘蛛视觉效果，不采集、记录或导出网站数据。
 
 ## Run it
 
